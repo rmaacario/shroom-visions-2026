@@ -92,3 +92,11 @@ learns.
 ## License
 
 MIT.
+
+## Notebooks and scripts
+
+`notebooks/` and the corresponding files in `src/` are the same program — the
+notebooks are how the tagger was developed on Kaggle, the scripts are the form
+the smoke test exercises. They are kept in sync; if you change one, change both.
+
+The notebooks carry no saved outputs.
