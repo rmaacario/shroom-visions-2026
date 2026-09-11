@@ -88,10 +88,14 @@ Rscript  analysis/fig_probe.R
 
 ## Notebooks and scripts
 
-`notebooks/01` and `02` are the same program as `src/01_span_tagger.py` and
-`src/02_category_strategies.py`; they carry no saved output. `notebooks/03` and
-`04` are different — they are the actual runs behind the published large-model
-numbers, kept with their output as a record, and have no counterpart in `src/`.
+`notebooks/` holds the two runs behind the published large-model numbers, kept
+with their output as a record. Both are Kaggle/Colab exports with their
+`execution_count` intact, so what you see is what ran.
+
+The scripts in `src/` are the same pipeline in plain-Python form, which is what
+the smoke test exercises. `src/01_span_tagger.py` is the earlier base-model
+configuration and is superseded by notebook 03; it is kept because the later
+stages import from it.
 
 ## Tests
 
