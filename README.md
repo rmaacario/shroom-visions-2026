@@ -25,11 +25,31 @@ Three findings drive the paper:
 ## Layout
 
 ```
-src/        the pipeline, numbered in run order
+notebooks/  the runs that produced the published numbers, with their output
+src/        the pipeline as scripts, numbered in run order
 analysis/   figure data and the R script that draws the paper figures
-notebooks/  the Kaggle notebooks the tagger was developed in
 tests/      end-to-end smoke test
 ```
+
+## Which file produced which result
+
+The published system is **XLM-R large**. `src/01_span_tagger.py` is the earlier
+**base** configuration and does not reproduce the paper's numbers on its own.
+
+| Table 1 row | produced by | lr | batch | epochs | embeddings |
+|---|---|---|---|---|---|
+| XLM-R base | `src/01_span_tagger.py` | 2e-5 | 16 | 3 | trained |
+| XLM-R large | `notebooks/03_large_tagger_kaggle.ipynb` | 1e-5 | 8 | 5 | trained |
+| + repr shift | `src/05_fused_tagger.py` over notebook 03 | 1e-5 | 8 | 5 | frozen |
+| + caption NLI | `src/05_fused_tagger.py` over notebook 03 | 1e-5 | 8 | 5 | frozen |
+| + BIO output | `notebooks/04_bio_tagger_colab.ipynb` | 1e-5 | 8 | 5 | frozen |
+
+Notebooks 03 and 04 carry their full output, including per-language development
+scores. `src/05_fused_tagger.py` replaces the model, dataset and training cells of
+notebook 03 and inherits its configuration; it has no hyperparameters of its own.
+
+Note that the response segment is truncated at 256 subwords, so characters past
+that point are never scored.
 
 ## Pipeline
 
@@ -68,11 +88,10 @@ Rscript  analysis/fig_probe.R
 
 ## Notebooks and scripts
 
-`notebooks/` and the corresponding files in `src/` are the same program — the
-notebooks are how the tagger was developed on Kaggle, the scripts are the form
-the smoke test exercises. They are kept in sync; if you change one, change both.
-
-The notebooks carry no saved outputs.
+`notebooks/01` and `02` are the same program as `src/01_span_tagger.py` and
+`src/02_category_strategies.py`; they carry no saved output. `notebooks/03` and
+`04` are different — they are the actual runs behind the published large-model
+numbers, kept with their output as a record, and have no counterpart in `src/`.
 
 ## Tests
 
