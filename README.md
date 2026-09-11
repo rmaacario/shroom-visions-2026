@@ -33,42 +33,35 @@ tests/      end-to-end smoke test
 
 ## Which file produced which result
 
-The published system is **XLM-R large**. `src/01_span_tagger.py` is the earlier
-**base** configuration and does not reproduce the paper's numbers on its own.
+Every number in Table 1 is an official leaderboard score. This table says which
+file contains the code behind each, and whether an executed copy of that run
+survives on disk.
 
-| Table 1 row | produced by | lr | batch | epochs | embeddings |
-|---|---|---|---|---|---|
-| XLM-R base | `src/01_span_tagger.py` | 2e-5 | 16 | 3 | trained |
-| XLM-R large | `notebooks/03_large_tagger_kaggle.ipynb` | 1e-5 | 8 | 5 | trained |
-| + repr shift | `src/05_fused_tagger.py` over notebook 03 | 1e-5 | 8 | 5 | frozen |
-| + caption NLI | `src/05_fused_tagger.py` over notebook 03 | 1e-5 | 8 | 5 | frozen |
-| + BIO output | `notebooks/04_bio_tagger_colab.ipynb` | 1e-5 | 8 | 5 | frozen |
+| Table 1 row | leaderboard id | code | executed record |
+|---|---|---|---|
+| XLM-R base | `xlmr-base-textonly-v1` | `src/01_span_tagger.py`, `notebooks/draft_base_tagger_unrun.ipynb` | none |
+| XLM-R large | `xlmr-large-textonly-v2` | `notebooks/run_span_tagger_kaggle.ipynb` | yes, 13/13 cells |
+| + repr shift | `xlmr-large-visual-v3` | `notebooks/master_kaggle_all_stages.ipynb`, cell "FUSED TAGGER" | none |
+| + caption NLI | `xlmr-large-visnli-v4` | `notebooks/master_kaggle_all_stages.ipynb`, cell "FINAL TAGGER" | none |
+| + BIO output | `xlmr-large-bio-v5` | `notebooks/run_bio_tagger_colab.ipynb` | yes, all outputs |
 
-Notebooks 03 and 04 carry their full output, including per-language development
-scores. `src/05_fused_tagger.py` replaces the model, dataset and training cells of
-notebook 03 and inherits its configuration; it has no hyperparameters of its own.
+`+ repr shift` is the submitted system. Its code is in the master notebook; the
+notebook was saved with outputs cleared, so no executed copy of that run exists
+here.
 
-Note that the response segment is truncated at 256 subwords, so characters past
-that point are never scored.
+### The notebooks
 
-## Pipeline
-
-| Script | Purpose |
+| file | what it is |
 |---|---|
-| `src/01_span_tagger.py` | Text-only XLM-R tagger. The baseline, and the fixed testbed for everything below. |
-| `src/02_category_strategies.py` | Three ways of mapping token category scores onto span labels. |
-| `src/03_output_likelihood.py` | Output-likelihood features from Qwen2-VL-2B with and without the image. Near chance; excluded from the final system. |
-| `src/04_representation_shift.py` | The 38 representation-shift features. The submitted signal. |
-| `src/05_fused_tagger.py` | XLM-R with those features concatenated to its final layer. Final submission. |
-| `src/06_captioners.py`, `06b`, `06c` | Caption each unique image once. |
-| `src/07_caption_nli.py`, `08_nli_features.py` | Verify response sentences against the caption with NLI. |
-| `src/09_adjudication.py` | Zero-shot LVLM adjudication. Scores below an empty submission. |
+| `master_kaggle_all_stages.ipynb` | The full Kaggle notebook: tagger, output-likelihood and representation-shift probes, captioning, NLI features, both fused taggers, and the adjudication probe. Complete source for rows 1-4. Saved with outputs cleared. |
+| `run_span_tagger_kaggle.ipynb` | The XLM-R large text-only run, executed, with training loss and per-language development scores. |
+| `run_probes_kaggle.ipynb` | Executed. Output-level likelihood features (all near chance) and the representation-shift probe, including the token-split vs response-split comparison. |
+| `run_bio_tagger_colab.ipynb` | The BIO run on Colab, executed, with development scores. |
+| `draft_*_unrun.ipynb` | Early base-model drafts. `execution_count` is empty on every cell, so they were saved without being run. Kept for provenance; they are not a source of any number. |
 
-`src/alignment.py` holds the character/token conversion, the one place where
-information can silently leak away, and `src/scoring.py` wraps the organizers'
-scorer unmodified.
-
-Steps 3 and 4 need a GPU. The rest runs on CPU.
+Configuration differs between the base and large rows: base was trained at
+lr 2e-5, batch 16, three epochs; every large row at lr 1e-5, batch 8, five
+epochs, with embeddings frozen in the fused and BIO rows.
 
 ## Data and weights
 
