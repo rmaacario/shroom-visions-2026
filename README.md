@@ -1,0 +1,94 @@
+# USP at SHROOM-Visions 2026
+
+Code for *Why Informative Proxy Visual Signals Do Not Localize Hallucinated Spans*,
+our entry to the SHROOM-Visions 2026 shared task.
+
+The task is to mark the hallucinated character spans in a vision–language model's
+response, in English, French, Italian and Chinese. The generating model is not
+released, so any model-derived signal is a **proxy**. Our system is a multilingual
+XLM-R token tagger; the paper asks what three proxy visual signals add to it, and
+why the answer is close to nothing.
+
+Three findings drive the paper:
+
+- Under the official metric, span **position** accounts for almost all attainable
+  Cor. Category labels contribute nothing to it, and graded probabilities add
+  0.018. An oracle sentence-level detector reaches 0.476 where gold spans reach
+  0.970.
+- Caption entailment carries real sentence-level information (AUROC 0.605 against
+  a 0.533 surface baseline) and still adds 0.002 Cor — the mismatch the
+  decomposition predicts.
+- Representation shift is fine-grained and informative in all four languages
+  (macro AUROC 0.652) yet adds 0.009 Cor, and neither granularity nor category
+  mixture explains the gap.
+
+## Layout
+
+```
+src/        the pipeline, numbered in run order
+analysis/   figure data and the R script that draws the paper figures
+notebooks/  the Kaggle notebooks the tagger was developed in
+tests/      end-to-end smoke test
+```
+
+## Pipeline
+
+| Script | Purpose |
+|---|---|
+| `src/01_span_tagger.py` | Text-only XLM-R tagger. The baseline, and the fixed testbed for everything below. |
+| `src/02_category_strategies.py` | Three ways of mapping token category scores onto span labels. |
+| `src/03_output_likelihood.py` | Output-likelihood features from Qwen2-VL-2B with and without the image. Near chance; excluded from the final system. |
+| `src/04_representation_shift.py` | The 38 representation-shift features. The submitted signal. |
+| `src/05_fused_tagger.py` | XLM-R with those features concatenated to its final layer. Final submission. |
+| `src/06_captioners.py`, `06b`, `06c` | Caption each unique image once. |
+| `src/07_caption_nli.py`, `08_nli_features.py` | Verify response sentences against the caption with NLI. |
+| `src/09_adjudication.py` | Zero-shot LVLM adjudication. Scores below an empty submission. |
+
+`src/alignment.py` holds the character/token conversion, the one place where
+information can silently leak away, and `src/scoring.py` wraps the organizers'
+scorer unmodified.
+
+Steps 3 and 4 need a GPU. The rest runs on CPU.
+
+## Data and weights
+
+Neither is included here. The dataset and participant kit belong to the task
+organizers; the images are not redistributed. Extracted features are ~275 MB and
+derived from that data. Point `DISTRIB` in `src/01_span_tagger.py` at your own copy.
+
+No trained checkpoints are published — training ran on Kaggle and the weights were
+not retained. `src/05_fused_tagger.py` regenerates one from the extracted features.
+
+## Figures
+
+```bash
+python analysis/export_fig_data.py
+Rscript  analysis/fig_probe.R
+```
+
+## Tests
+
+```bash
+python tests/smoke_test.py
+```
+
+Exercises the tagger end to end on CPU with a randomly initialised encoder: tensor
+shapes, collation, token gather, both losses, inference, span construction, scoring
+and submission format. It verifies that the plumbing holds, not that the model
+learns.
+
+## Citation
+
+```bibtex
+@inproceedings{fernandes2026usp,
+  title     = {USP at SHROOM-Visions: Why Informative Proxy Visual Signals
+               Do Not Localize Hallucinated Spans},
+  author    = {Fernandes, Rafael Mac\'ario},
+  booktitle = {Proceedings of SHROOM-Visions 2026},
+  year      = {2026}
+}
+```
+
+## License
+
+MIT.

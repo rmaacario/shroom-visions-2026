@@ -1,0 +1,25 @@
+lang,block,auroc,sd
+en,early,0.53360,0.01555
+fr,early,0.50868,0.01246
+it,early,0.56087,0.00852
+zh,early,0.57352,0.01083
+en,middle,0.51938,0.01256
+fr,middle,0.55256,0.01115
+it,middle,0.56396,0.00993
+zh,middle,0.58206,0.01238
+en,late,0.59307,0.00944
+fr,late,0.59619,0.01489
+it,late,0.49524,0.01045
+zh,late,0.54691,0.01067
+en,all three depths,0.66776,0.01375
+fr,all three depths,0.62345,0.01038
+it,all three depths,0.60055,0.00864
+zh,all three depths,0.62641,0.00354
+en,32-d projection,0.62008,0.01754
+fr,32-d projection,0.61034,0.01279
+it,32-d projection,0.59830,0.01659
+zh,32-d projection,0.62482,0.01293
+en,all 38 features,0.68185,0.01554
+fr,all 38 features,0.63929,0.01274
+it,all 38 features,0.62881,0.01429
+zh,all 38 features,0.65716,0.00829

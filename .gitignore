@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+.ipynb_checkpoints/
+
+# data and derived artifacts, not redistributed
+data/
+*.npz
+*.jsonl
+*.pt
